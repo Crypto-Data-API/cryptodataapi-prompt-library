@@ -6,7 +6,7 @@
 Interpret the quant HMM regime engine's current market state and probability distribution, then translate it into a plain-English, risk-appropriate playbook.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/quant/market` (Pro tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/quant/market` (Pro tier)
 - **Fields used:** `regime`, `label`, `confidence`, `probabilities`, `directional`, `volatility`, `tomorrow`
 
 ## The Prompt
@@ -46,6 +46,17 @@ Give me a plain-English regime briefing. Cover: (1) the current regime label, na
 
 Playbook: The market is in a low-conviction choppy range - the 0.44 confidence and neutral-tilted directional head say there is no durable trend to lean on right now. Volatility is already elevated and the most probable transition is into a high-volatility bear state, so the environment is decaying rather than stabilising. This argues for a defensive, reduced-size posture and tight risk on any position; liquidation_risk is only moderate for now but would spike if that bear transition fires. A clean move to strong_trend_bull with rising confidence would invalidate this cautious read.
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/quant/market
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - This endpoint is Pro tier - send an X-API-Key: cdk_live_... header on a pro or pro_plus key.

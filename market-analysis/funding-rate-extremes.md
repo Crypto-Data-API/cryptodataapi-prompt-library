@@ -6,8 +6,8 @@
 Surface coins whose perpetual funding has gone extreme, flagging crowded, over-leveraged positioning that often precedes a squeeze.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/derivatives/funding-rates` (Free tier)
-- **Endpoint:** `GET /api/v1/hyperliquid/summary` (Free tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/derivatives/funding-rates` (Free tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/hyperliquid/summary` (Free tier)
 - **Fields used:** `funding_rate`, `open_interest`, `cross_exchange`, `coin`
 
 ## The Prompt
@@ -38,6 +38,17 @@ Identify the coins with the most extreme funding (both positive and negative). F
 
 Summary: Positioning is most stretched in SOL, where longs are paying a triple-digit annualised rate into rising open interest — a classic crowded-long setup vulnerable to a long squeeze. PEPE shorts are similarly crowded but on flat OI, a weaker signal.
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/derivatives/funding-rates
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - Pair with /api/v1/quant/market for regime context — extreme funding in a strong-trend regime resolves differently than in a chop regime.

@@ -6,8 +6,8 @@
 An agent that turns on-chain exchange-flow spikes and sentiment extremes into concise, push-ready Telegram alerts — one short, emoji-tagged message per material event.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/on-chain/exchange-flows/spike-alerts` (Free tier)
-- **Endpoint:** `GET /api/v1/sentiment/fear-greed` (Free tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/on-chain/exchange-flows/spike-alerts` (Free tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/sentiment/fear-greed` (Free tier)
 - **Fields used:** `spike_alerts`, `value`, `classification`
 
 ## The Prompt
@@ -46,6 +46,17 @@ For each MATERIAL spike, write one Telegram-ready alert (≤ 300 chars): emoji t
 
 (No other spikes crossed the material threshold this cycle.)
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/on-chain/exchange-flows/spike-alerts
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - Pair the two endpoints every cycle: spike-alerts is the trigger, fear-greed is the one-line context stamped on each message.

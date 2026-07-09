@@ -6,7 +6,7 @@
 Wire CryptoDataAPI into Claude through an MCP tool so Claude can pull a full one-call market snapshot on demand and answer any market question grounded in live data — no copy-paste, no stale context.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/daily` (Free tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/daily` (Free tier)
 - **Fields used:** `daily`, `market_health`, `sentiment`, `derivatives`
 
 ## The Prompt
@@ -46,6 +46,17 @@ Derivatives: funding is mildly positive and open interest is holding (derivative
 
 Net: a healthy longer-term backdrop with softer short-term momentum and mild long-side crowding. Caveat: this is a once-daily snapshot (~6h old) — for intraday moves you'd need a live feed. Not financial advice.
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/daily
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - One call, whole picture: /api/v1/daily bundles prices, market_health, sentiment, and derivatives so a single MCP tool covers most market Q&A without chaining endpoints.

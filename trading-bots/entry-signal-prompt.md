@@ -6,7 +6,7 @@
 A drop-in prompt a trading bot calls per candle to decide whether an entry condition is confirmed by the per-coin quant model - returning a strict, machine-parseable verdict gated on regime and direction-probability thresholds.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/quant/coins/{symbol}` (Pro tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/quant/coins/{symbol}` (Pro tier)
 - **Fields used:** `symbol`, `regime`, `p_direction_up`, `p_direction_down`, `explain`
 
 ## The Prompt
@@ -46,6 +46,17 @@ Apply the entry gate and return ONLY the JSON verdict object per the output cont
 ```
 {"enter": true, "side": "long", "confidence": 0.62, "reason": "regime=strong_trend_bull conf=0.71 p_up=0.62 p_down=0.19 gap=0.43 transition_ok"}
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/quant/coins/{symbol}
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - Run this at temperature 0 with a fixed system prompt so the same quant object always yields the same verdict - a bot needs determinism, not creativity.

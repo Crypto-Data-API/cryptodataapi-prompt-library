@@ -6,8 +6,8 @@
 Turn historical daily market snapshots and the long regime history into concrete, testable strategy hypotheses - each with explicit entry/exit rules, the regime condition it exploits, and a falsifiable edge you can actually backtest.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/backtesting/daily-snapshots` (Pro tier)
-- **Endpoint:** `GET /api/v1/quant/regimes/history` (Pro Plus tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/backtesting/daily-snapshots` (Pro tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/quant/regimes/history` (Pro Plus tier)
 - **Fields used:** `daily_snapshots`, `regime`, `regime_history`
 
 ## The Prompt
@@ -63,6 +63,17 @@ Generate 2-3 concrete, backtestable strategy hypotheses. For each one, give me: 
 
 All three are hypotheses to backtest, not recommendations. Each is designed to be provably WRONG.
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/backtesting/daily-snapshots
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - /backtesting/daily-snapshots (Pro) lists the archived dates; fetch /backtesting/daily-snapshots/{date} for the full point-in-time snapshot of each day - the no-look-ahead feature set for your backtest.

@@ -6,7 +6,7 @@
 An adversarial reviewer that stress-tests a proposed strategy and its in-sample backtest for overfitting BEFORE any capital is risked - flagging the red flags and prescribing concrete out-of-sample tests.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/backtesting/klines` (Pro tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/backtesting/klines` (Pro tier)
 - **Fields used:** `klines`, `out_of_sample`
 
 ## The Prompt
@@ -60,6 +60,17 @@ Act as an adversarial reviewer and stress-test this for overfitting. Produce: (1
 3. Add funding + slippage and re-check whether the edge clears costs at this frequency.
 4. Require >= 50 trades per test window before trusting any metric.
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/backtesting/klines
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - /backtesting/klines (Pro) returns historical OHLCV per symbol/interval - the raw material for a genuine out-of-sample re-test on windows the strategy was never tuned on.

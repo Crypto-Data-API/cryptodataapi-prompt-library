@@ -6,8 +6,8 @@
 Adapt a bot's execution style - order type, aggression, participation rate, slice size - to the current market regime, volatility, and live order-book depth, so a fill does not move the market or bleed on slippage in a thin, fast tape.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/quant/market` (Pro tier)
-- **Endpoint:** `GET /api/v1/liquidity/depth` (Free tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/quant/market` (Pro tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/liquidity/depth` (Free tier)
 - **Fields used:** `regime`, `volatility`, `spread_bps`, `total_depth_25bps_usd`, `imbalance_10bps`
 
 ## The Prompt
@@ -44,6 +44,17 @@ Return a compact JSON execution config: {"order_type", "aggression", "max_partic
 ```
 {"order_type": "twap", "aggression": "passive-follow", "max_participation_pct": 12, "slice_size_usd": 45000, "limit_offset_bps": 2, "pause_if": "spread_bps > 8 OR total_depth_25bps_usd < 1500000 OR volatility.high > 0.5", "rationale": "regime=strong_trend_bull, volatility elevated (0.58) -> scheduled TWAP not market; book deep (total_depth_25bps=$3.75M, spread 1.4bps) and bid-heavy (imbalance_10bps +0.18) so rest buys 2bps inside; slice $45k ~= 12% of 25bps depth to avoid walking the book."}
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/quant/market
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - /api/v1/quant/market is Pro (regime + volatility distribution); /api/v1/liquidity/depth is free (per-coin spread_bps, depth_usd buckets, total_depth_25bps_usd, imbalance_10bps) - fetch both each time you (re)work an order.

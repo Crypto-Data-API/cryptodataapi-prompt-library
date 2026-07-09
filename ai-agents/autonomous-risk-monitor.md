@@ -6,9 +6,9 @@
 An always-on agent that continuously watches market-wide risk and raises its alert level when regime, liquidity fragility, and liquidations line up to danger — so a human or downstream system can de-risk before a cascade.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/quant/market` (Pro tier)
-- **Endpoint:** `GET /api/v1/liquidity/regime/score` (Free tier)
-- **Endpoint:** `GET /api/v1/market-intelligence/liquidations` (Free tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/quant/market` (Pro tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/liquidity/regime/score` (Free tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/market-intelligence/liquidations` (Free tier)
 - **Fields used:** `regime`, `liquidation_risk`, `fragility_score`, `liquidations`
 
 ## The Prompt
@@ -49,6 +49,17 @@ All three align to the downside: an over-leveraged, thinly-supported tape active
 
 De-risking band: DEFENSIVE — cut gross leverage toward the low end of your mandate, raise cash buffers, and prefer hedged over naked exposure until fragility_score falls back below 60 and liquidation_risk under 0.5. (Risk posture only — no directional call.)
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/quant/market
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - Poll cadence: /market-intelligence/liquidations and /liquidity/regime/score move fast (poll every 1-5 min); /quant/market regime updates on a slower cadence, so cache it and re-pull every ~15-30 min.

@@ -6,7 +6,7 @@
 Read aggregate Hyperliquid whale positioning (accounts of >=$100k) to see what large, informed perpetual traders are doing - net bias and where their strongest conviction sits.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/quant/whales` (Pro tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/quant/whales` (Pro tier)
 - **Fields used:** `summary`, `long_short_ratio`, `net_bias`, `top_coins`, `directional_net_usd`
 
 ## The Prompt
@@ -45,6 +45,17 @@ Summarise what the whales are doing. Cover: (1) the aggregate net bias - long_sh
 
 Summary: Whales are net long overall (ratio 1.34) with their heaviest directional conviction in BTC and ETH longs, which reinforces the bullish aggregate bias, while SOL is the notable contrarian short. This reflects PERPETUAL positioning only - spot holdings are not captured, so the SOL and any other shorts could be hedges rather than outright bearish bets.
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/quant/whales
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - This endpoint is Pro tier - send an X-API-Key: cdk_live_... header on a pro or pro_plus key.

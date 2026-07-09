@@ -6,7 +6,7 @@
 Design and interpret a walk-forward analysis using the long daily regime timeline, so a strategy is validated across changing market regimes - not one lucky period - with explicit train/test folds and regime-decay checks.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/quant/timeline` (Pro Plus tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/quant/timeline` (Pro Plus tier)
 - **Fields used:** `timeline`, `regime`, `folds`
 
 ## The Prompt
@@ -61,6 +61,17 @@ Design a walk-forward analysis for this strategy. Give me: (1) anchored vs rolli
 
 **Regime-dependent decay to watch for:** green (pass) on every fold whose test window is trend-dominated and red (fail) on every fold containing choppy_range or high_volatility_bear. That pattern means the 'edge' is really a long-trend beta - report it honestly as a trend-only strategy rather than a general one, and never deploy it into a chop/bear regime the live /quant/timeline is flagging.
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/quant/timeline
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - /quant/timeline is Pro Plus - send a pro_plus X-API-Key: cdk_live_... key. It returns the daily regime series from 2019 to now, ideal for slicing history into regime-diverse folds.

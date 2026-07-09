@@ -6,8 +6,8 @@
 An agent that scans the full coin universe and emits a ranked, evidence-backed shortlist of WATCH signals by combining each coin's quant regime and directional probabilities with cross-exchange funding.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/quant/coins` (Pro tier)
-- **Endpoint:** `GET /api/v1/derivatives/funding-rates` (Free tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/quant/coins` (Pro tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/derivatives/funding-rates` (Free tier)
 - **Fields used:** `symbol`, `regime`, `p_direction_up`, `top_transition`, `funding_rate`
 
 ## The Prompt
@@ -45,6 +45,17 @@ Scan the universe and emit a ranked shortlist of at most 6 WATCH signals where r
 
 Watch signals only — factors are aligned but this is not a trade instruction. Coins with conflicting regime/funding or negligible oi_usd were dropped.
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/quant/coins
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - Join the two feeds on symbol before you reason: /quant/coins gives regime + probabilities, /derivatives/funding-rates confirms or contradicts via positioning. A coin present in one but not the other should score lower.

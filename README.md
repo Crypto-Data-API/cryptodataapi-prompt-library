@@ -20,6 +20,12 @@ data = r.json()          # paste into a prompt's {data} placeholder
 
 Get a free key at [cryptodataapi.com/login](https://cryptodataapi.com/login) — no signup required for most market-data feeds. See [pricing](https://cryptodataapi.com/pricing) for Pro / Pro Plus feeds.
 
+**Prefer a native tool?** Install the MCP server (Claude / Cursor / any MCP client):
+
+```bash
+claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp
+```
+
 **Used with:** Claude · GPT-4o · Gemini · Cursor · Continue
 
 ## Prompts

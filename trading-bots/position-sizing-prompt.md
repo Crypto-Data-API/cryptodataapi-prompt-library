@@ -6,7 +6,7 @@
 Size a position inversely to expected volatility using the bulk per-coin risk model, so risk-per-trade stays constant across coins and a stop is hit at the same dollar loss whether you trade BTC or a small-cap.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/quant/coins/risk` (Pro tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/quant/coins/risk` (Pro tier)
 - **Fields used:** `symbol`, `risk`, `volatility`, `suggested_size`
 
 ## The Prompt
@@ -53,6 +53,17 @@ Working:
 - leverage_cap = 6,510 / 25,000 = 0.26x raw; regime calm but vol_pctile_30=0.62 is elevated, so the 5x ceiling is trimmed to 3.3x. Position sits well under the cap.
 - Reminder: this is sizing arithmetic, not a signal to trade SOL.
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/quant/coins/risk
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - /api/v1/quant/coins/risk (Pro) returns the whole universe in one call - vol_target_multiplier, rv_24h and vol_pctile_30 per coin - so a bot can size any symbol from a single fetch.

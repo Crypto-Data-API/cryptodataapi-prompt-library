@@ -6,7 +6,7 @@
 Find coins where price and open interest are diverging - revealing the conviction behind a move, from fresh-money trends to hollow short-covering bounces.
 
 ## Data Required
-- **Endpoint:** `GET /api/v1/liquidity/oi-divergence` (Free tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/liquidity/oi-divergence` (Free tier)
 - **Fields used:** `coin`, `open_interest_usd`, `price_change_4h_pct`, `oi_change_4h_pct`, `divergence_4h`
 
 ## The Prompt
@@ -46,6 +46,17 @@ Classify each notable coin into one of the four quadrants - new longs (price up 
 
 Summary: SUI shows the highest-quality move on the board - price and OI both rising into a large book means new longs are driving it, and it tops the divergence ranking. XRP's rally is the weakest of the group: rising price on falling OI is short covering on heavy open interest, a bounce with no fresh demand behind it.
 ```
+
+## Get the data
+
+```bash
+curl -H "X-API-Key: cdk_live_yourkey" \
+  https://cryptodataapi.com/api/v1/liquidity/oi-divergence
+```
+
+- **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
 - This endpoint is free - any valid cdk_live_ key works via the X-API-Key header.
