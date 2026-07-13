@@ -31,13 +31,16 @@ Formatting rules for each material alert:
 - No price predictions, no buy/sell calls — describe the flow and the context only.
 
 [USER]
-Here are the latest exchange-flow spike alerts and the current Fear & Greed reading from CryptoDataAPI:
-
-{data}
-
-(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/on-chain/exchange-flows/spike-alerts ; GET https://cryptodataapi.com/api/v1/sentiment/fear-greed - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+First, get the live data: GET https://cryptodataapi.com/api/v1/on-chain/exchange-flows/spike-alerts ; GET https://cryptodataapi.com/api/v1/sentiment/fear-greed — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
 
 For each MATERIAL spike, write one Telegram-ready alert (≤ 300 chars): emoji tag, asset + chain, direction in plain words (inflow = potential sell pressure; outflow = accumulation), the size, and the current Fear & Greed value + classification. If nothing is material this cycle, return a single line saying so. Output the raw messages only — no preamble.
+
+[OUTPUT FORMAT — mimic the structure, not the values]
+🔴⚠️ USDT · Ethereum — LARGE exchange INFLOW +$142M (z 4.1), ~4x baseline. Coins moving TO exchanges = potential sell pressure. Sentiment: F&G 61 (Greed). Watch for follow-through. #onchain
+
+🟢 BTC · Bitcoin — Exchange OUTFLOW +$88M (z 2.6). Coins leaving exchanges = accumulation / self-custody. Sentiment: F&G 61 (Greed). #onchain
+
+(No other spikes crossed the material threshold this cycle.)
 ```
 
 ## Example Output

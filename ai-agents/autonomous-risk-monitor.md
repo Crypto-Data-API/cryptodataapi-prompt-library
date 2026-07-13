@@ -29,13 +29,21 @@ Scoring rules — set the level by CONFLUENCE, not any single input:
 Always: name the 2-3 specific signals that drove the level (with their values), map to a de-risking action BAND (e.g. hold / trim leverage / raise cash / hedge), and stay strictly on risk posture. Never emit a directional trade call.
 
 [USER]
-Here is the current market risk snapshot from CryptoDataAPI (quant regime, liquidity fragility, and live liquidations):
-
-{data}
-
-(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/quant/market ; GET https://cryptodataapi.com/api/v1/liquidity/regime/score ; GET https://cryptodataapi.com/api/v1/market-intelligence/liquidations - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+First, get the live data: GET https://cryptodataapi.com/api/v1/quant/market ; GET https://cryptodataapi.com/api/v1/liquidity/regime/score ; GET https://cryptodataapi.com/api/v1/market-intelligence/liquidations — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
 
 Assess market-wide risk right now. Return exactly: (1) RISK LEVEL as one of GREEN / AMBER / RED; (2) the 2-3 signals that drove it, each with its value (regime.label, liquidation_risk, fragility_score, and the dominant liquidation side/size); (3) a recommended de-risking action band (posture only — no buy/sell calls). Keep it under 120 words and lead with the level.
+
+[OUTPUT FORMAT — mimic the structure, not the values]
+RISK LEVEL: RED
+
+Drivers:
+- Regime: risk_off_high_vol, liquidation_risk 0.74 (probabilities.liquidation_risk).
+- Liquidity fragility_score 78/100, band "fragile" — books are thin.
+- Liquidations one-sided: $184M longs vs $22M shorts, BTC + ETH driving ~70%.
+
+All three align to the downside: an over-leveraged, thinly-supported tape actively liquidating longs. This is a cascade-prone configuration, not a single outlier.
+
+De-risking band: DEFENSIVE — cut gross leverage toward the low end of your mandate, raise cash buffers, and prefer hedged over naked exposure until fragility_score falls back below 60 and liquidation_risk under 0.5. (Risk posture only — no directional call.)
 ```
 
 ## Example Output
@@ -66,7 +74,7 @@ curl -H "X-API-Key: cdk_live_yourkey" \
 ## Notes
 - Poll cadence: /market-intelligence/liquidations and /liquidity/regime/score move fast (poll every 1-5 min); /quant/market regime updates on a slower cadence, so cache it and re-pull every ~15-30 min.
 - Feed all three payloads together in {data} — the level is defined by confluence, so a single endpoint in isolation will misfire.
-- Add ?format=markdown to each endpoint for clean plain-text you can paste straight into {data}. /quant/market requires a pro (or pro_plus) key; the other two work on any key.
+- Add ?format=markdown to each endpoint for clean plain-text you can hand your LLM clean plain text instead of raw JSON. /quant/market requires a pro (or pro_plus) key; the other two work on any key.
 
 ---
 

@@ -27,13 +27,22 @@ GROUNDING RULES (non-negotiable):
 - If a field the user asks about is absent from the snapshot, say so plainly rather than guessing.
 
 [USER]
+First, get the live data: GET https://cryptodataapi.com/api/v1/daily — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
+
 The get_market_snapshot tool returned the current CryptoDataAPI daily snapshot:
 
-{data}
-
-(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/daily - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
-
 Using ONLY this snapshot, give me a grounded read of the market right now: overall market_health (long-term vs short-term), the sentiment reading and what it implies, and the derivatives summary (funding / open interest tone). Cite the specific fields you used and state the snapshot's age. Note explicitly that this is a once-a-day snapshot, not real-time data. No trade advice.
+
+[OUTPUT FORMAT — mimic the structure, not the values]
+Snapshot age: built 2026-07-09 20:00 UTC (~6h ago) — a daily snapshot, not live ticks.
+
+Market health: constructive but cooling. Long-term score reads 68/100 (market_health.long_term) while the short-term score is 54/100 (market_health.short_term) — the structural trend is healthier than near-term momentum, i.e. some loss of upside pressure without a regime break.
+
+Sentiment: Fear & Greed at 61 — "Greed" (sentiment.value / sentiment.classification). Elevated but not euphoric; historically a zone where crowding risk starts to build.
+
+Derivatives: funding is mildly positive and open interest is holding (derivatives summary) — longs are paying to hold, consistent with the Greed reading but not yet at squeeze extremes.
+
+Net: a healthy longer-term backdrop with softer short-term momentum and mild long-side crowding. Caveat: this is a once-daily snapshot (~6h old) — for intraday moves you'd need a live feed. Not financial advice.
 ```
 
 ## Example Output

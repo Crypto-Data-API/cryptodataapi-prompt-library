@@ -28,13 +28,18 @@ How to combine into a signal:
 Assign each surviving coin a confidence (LOW / MEDIUM / HIGH) reflecting how many factors agree and how cleanly. Rank the shortlist by confidence, then by |p_direction - 0.5|. Give every signal a one-line rationale citing the actual values. These are watch signals, not trade instructions.
 
 [USER]
-Here is the current per-coin quant universe and cross-exchange funding from CryptoDataAPI:
-
-{data}
-
-(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/quant/coins ; GET https://cryptodataapi.com/api/v1/derivatives/funding-rates - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+First, get the live data: GET https://cryptodataapi.com/api/v1/quant/coins ; GET https://cryptodataapi.com/api/v1/derivatives/funding-rates — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
 
 Scan the universe and emit a ranked shortlist of at most 6 WATCH signals where regime, directional probability, and funding agree (bullish or bearish). Return a markdown table with columns: Rank, Symbol, Direction, Confidence, Regime, p_direction, Funding, Rationale (one line). Exclude coins where the factors conflict or open interest is negligible. These are watch signals only — no entries, sizing, or orders.
+
+[OUTPUT FORMAT — mimic the structure, not the values]
+| # | Symbol | Direction | Confidence | Regime | p_dir | Funding | Rationale |
+|---|--------|-----------|-----------|--------|-------|---------|-----------|
+| 1 | SOL | Bullish | HIGH | trending_up | up 0.71 | +0.011% (neutral+) | Strong up-regime, 71% up-prob, funding supportive not crowded, top_transition stays trending_up (p 0.63). |
+| 2 | ETH | Bullish | MEDIUM | recovery | up 0.64 | +0.006% | Constructive regime + 64% up-prob on deep OI; funding calm, transition into trending_up (p 0.55). |
+| 3 | ARB | Bearish | MEDIUM | risk_off | down 0.66 | -0.014% | Risk-off regime, 66% down-prob, shorts building via negative funding. |
+
+Watch signals only — factors are aligned but this is not a trade instruction. Coins with conflicting regime/funding or negligible oi_usd were dropped.
 ```
 
 ## Example Output

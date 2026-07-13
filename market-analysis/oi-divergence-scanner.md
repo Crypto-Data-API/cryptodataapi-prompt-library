@@ -28,13 +28,19 @@ Rules:
 - Never give financial advice. Describe the character and conviction of the move, not 'buy' or 'sell' calls.
 
 [USER]
-Here is the current open-interest divergence scan from CryptoDataAPI:
-
-{data}
-
-(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/liquidity/oi-divergence - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+First, get the live data: GET https://cryptodataapi.com/api/v1/liquidity/oi-divergence — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
 
 Classify each notable coin into one of the four quadrants - new longs (price up / OI up), short covering (price up / OI down), new shorts (price down / OI up), or long liquidation (price down / OI down) - using the 4h price and OI changes. For each, note the OI context (open_interest_usd) and what the divergence implies about conviction. Rank them by the absolute value of divergence_4h, flagging the strongest fresh-money moves and the weakest hollow ones. Return a markdown table plus a two-sentence summary.
+
+[OUTPUT FORMAT — mimic the structure, not the values]
+| Coin | Price 4h | OI 4h | Quadrant | OI (USD) | Read |
+|------|---------|-------|----------|----------|------|
+| SUI  | +6.2%   | +14.1% | New longs        | $410M | Strong, fresh-money advance |
+| XRP  | +3.8%   | -9.4%  | Short covering   | $1.2B | Hollow bounce - fades easily |
+| AVAX | -4.5%   | +11.0% | New shorts       | $305M | Conviction decline, real selling |
+| DOGE | -5.1%   | -12.7% | Long liquidation | $480M | Capitulation flush, watch exhaustion |
+
+Summary: SUI shows the highest-quality move on the board - price and OI both rising into a large book means new longs are driving it, and it tops the divergence ranking. XRP's rally is the weakest of the group: rising price on falling OI is short covering on heavy open interest, a bounce with no fresh demand behind it.
 ```
 
 ## Example Output

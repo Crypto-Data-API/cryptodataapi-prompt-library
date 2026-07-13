@@ -34,13 +34,28 @@ Rules:
 - Never promise the strategy will work. You are designing the test that could break it.
 
 [USER]
-Here is the daily regime timeline from CryptoDataAPI's quant engine, plus the strategy to validate:
-
-{data}
-
-(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/quant/timeline - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+First, get the live data: GET https://cryptodataapi.com/api/v1/quant/timeline — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
 
 Design a walk-forward analysis for this strategy. Give me: (1) anchored vs rolling recommendation with a one-line justification; (2) a table of the concrete train -> test folds (dates + train:test ratio); (3) for each TEST fold, the regimes it spans from the timeline and whether it is regime-diverse or monotone (flag the monotone ones); (4) explicit PASS/FAIL criteria per fold and in aggregate; and (5) what regime-dependent decay would look like - the specific pattern across folds that would tell me the edge is regime-conditional rather than general. Do not predict performance.
+
+[OUTPUT FORMAT — mimic the structure, not the values]
+**Recommendation: rolling walk-forward.** The strategy is regime-sensitive, so a fixed 12-month train window that slides forward keeps the model adapting to the current regime mix rather than diluting recent behaviour into a decade-long anchor.
+
+**Folds (train:test = 4:1, 12mo train / 3mo test, step 3mo):**
+
+| Fold | Train | Test | Test regimes (from timeline) | Diversity |
+|------|-------|------|------------------------------|-----------|
+| 1 | 2022-01..2022-12 | 2023-01..2023-03 | choppy_range -> strong_trend_bull | Diverse |
+| 2 | 2022-04..2023-03 | 2023-04..2023-06 | strong_trend_bull (monotone) | MONOTONE - flag |
+| 3 | 2022-07..2023-06 | 2023-07..2023-09 | choppy_range / high_volatility_bear | Diverse |
+| 4 | 2024-10..2025-09 | 2025-10..2025-12 | strong_trend_bull -> choppy_range | Diverse |
+
+**Pass/fail criteria:**
+- Per fold: positive net-of-cost return AND >= 30 test trades AND out-of-sample Sharpe >= 0.5 * the train-window Sharpe (guards against fit-only edges).
+- Fold 2 is regime-monotone (all strong_trend_bull) - treat it as non-diagnostic; do not let a strong bull-only fold flatter the aggregate.
+- Aggregate: the strategy PASSES only if it clears the bar in the majority of REGIME-DIVERSE folds, including at least one containing high_volatility_bear.
+
+**Regime-dependent decay to watch for:** green (pass) on every fold whose test window is trend-dominated and red (fail) on every fold containing choppy_range or high_volatility_bear. That pattern means the 'edge' is really a long-trend beta - report it honestly as a trend-only strategy rather than a general one, and never deploy it into a chop/bear regime the live /quant/timeline is flagging.
 ```
 
 ## Example Output

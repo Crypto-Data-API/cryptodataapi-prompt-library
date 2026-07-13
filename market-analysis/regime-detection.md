@@ -27,13 +27,22 @@ Rules:
 - Never give buy or sell advice. Describe the regime and the risk it implies, not directional trade calls.
 
 [USER]
-Here is the current market regime from CryptoDataAPI's quant engine:
-
-{data}
-
-(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/quant/market - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+First, get the live data: GET https://cryptodataapi.com/api/v1/quant/market — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
 
 Give me a plain-English regime briefing. Cover: (1) the current regime label, name, and confidence, and whether that confidence is decisive or mixed (cite the posterior and run length from explain); (2) what the directional, volatility, and liquidation_risk probability distributions say about the environment; (3) the single most likely regime transition and what the 'tomorrow' outlook adds; and (4) a risk-appropriate stance — caution level and position-sizing bias — plus the regime that would invalidate it. Do NOT tell me to buy or sell. Return a short markdown table (columns: Head | Top buckets | Read) followed by a playbook of at most four sentences.
+
+[OUTPUT FORMAT — mimic the structure, not the values]
+**Regime:** Choppy / High Vol (`choppy_high_vol`) — confidence 0.44 (mixed, transitional; posterior 0.51, 3 candles in state) — model v2.0.0
+
+| Head | Top buckets (probability) | Read |
+|------|---------------------------|------|
+| Directional | flat 0.38 · mild_down 0.27 · mild_up 0.18 | No conviction, faint down-tilt |
+| Volatility | high 0.52 · medium 0.33 · low 0.15 | Expanded and staying loud |
+| Liquidation risk | high 0.47 · medium 0.32 · low 0.21 | Primed; depth flagged 'thin' |
+| Transition (next) | vol_spike 0.34 · stays choppy_high_vol 0.31 | Decaying toward a spike |
+| Tomorrow (24h) | p50 −0.4% · p5 −6.1% / p95 +4.8% · P(vol-spike) 18% | Fat downside tail |
+
+Playbook: This is a low-conviction, high-volatility chop — the 0.44 confidence and flat-tilted directional head say there is no durable trend to lean on. The most probable transition is into vol_spike and liquidation risk is high on a thin book, so the environment is decaying rather than stabilising. That argues for a defensive, reduced-size posture with restrained leverage and tight risk on anything held. A decisive move to strong_trend_bull (or the volatility head collapsing to low) with rising confidence would invalidate this cautious read.
 ```
 
 ## Example Output

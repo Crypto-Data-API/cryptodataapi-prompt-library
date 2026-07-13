@@ -33,13 +33,14 @@ Rules:
 - This governs execution of an already-decided order; it is not a signal to enter or exit.
 
 [USER]
+First, get the live data: GET https://cryptodataapi.com/api/v1/quant/market ; GET https://cryptodataapi.com/api/v1/liquidity/depth — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
+
 Configure execution for an order that is already decided and sized. Here is the current market regime (/api/v1/quant/market) and the coin's live order-book depth (/api/v1/liquidity/depth) from CryptoDataAPI:
 
-{data}
-
-(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/quant/market ; GET https://cryptodataapi.com/api/v1/liquidity/depth - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
-
 Return a compact JSON execution config: {"order_type", "aggression", "max_participation_pct", "slice_size_usd", "limit_offset_bps", "pause_if", "rationale"}. Base slice_size_usd and max_participation on the actual total_depth_25bps_usd, choose order_type from the regime + volatility, use imbalance_10bps to pick the passive side, and give an explicit pause condition. One-line rationale only.
+
+[OUTPUT FORMAT — mimic the structure, not the values]
+{"order_type": "twap", "aggression": "passive-follow", "max_participation_pct": 12, "slice_size_usd": 45000, "limit_offset_bps": 2, "pause_if": "spread_bps > 8 OR total_depth_25bps_usd < 1500000 OR volatility.high > 0.5", "rationale": "regime=strong_trend_bull, volatility elevated (0.58) -> scheduled TWAP not market; book deep (total_depth_25bps=$3.75M, spread 1.4bps) and bid-heavy (imbalance_10bps +0.18) so rest buys 2bps inside; slice $45k ~= 12% of 25bps depth to avoid walking the book."}
 ```
 
 ## Example Output

@@ -26,13 +26,17 @@ Rules:
 - Never give financial advice. Describe positioning and risk, not 'buy' or 'sell' calls.
 
 [USER]
-Here is the current cross-exchange funding data from CryptoDataAPI:
-
-{data}
-
-(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/market-intelligence/funding-rates ; GET https://cryptodataapi.com/api/v1/market-intelligence/open-interest ; GET https://cryptodataapi.com/api/v1/derivatives/funding-rates ; GET https://cryptodataapi.com/api/v1/hyperliquid/funding-rates - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+First, get the live data: GET https://cryptodataapi.com/api/v1/market-intelligence/funding-rates ; GET https://cryptodataapi.com/api/v1/market-intelligence/open-interest ; GET https://cryptodataapi.com/api/v1/derivatives/funding-rates ; GET https://cryptodataapi.com/api/v1/hyperliquid/funding-rates — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
 
 Identify the coins with the most extreme funding (both positive and negative). For each, state: the 8h and annualised rate, whether longs or shorts are crowded, the open interest context, and the direction of squeeze risk. Rank them by how stretched the positioning is, and call out any coin where funding and OI are BOTH rising (building leverage). Return a short markdown table plus a two-sentence summary.
+
+[OUTPUT FORMAT — mimic the structure, not the values]
+| Coin | 8h funding | Annualised | Crowded side | OI context | Squeeze risk |
+|------|-----------|-----------|-------------|-----------|-------------|
+| SOL  | +0.11%    | +120%     | Longs       | OI +22% / 24h | Downside |
+| PEPE | -0.09%    | -98%      | Shorts      | OI flat       | Upside   |
+
+Summary: Positioning is most stretched in SOL, where longs are paying a triple-digit annualised rate into rising open interest — a classic crowded-long setup vulnerable to a long squeeze. PEPE shorts are similarly crowded but on flat OI, a weaker signal.
 ```
 
 ## Example Output
@@ -60,7 +64,7 @@ curl -H "X-API-Key: cdk_live_yourkey" \
 - Universe scan: /api/v1/market-intelligence/funding-rates returns per-exchange 8h funding for the full coin universe (~177 coins); /api/v1/market-intelligence/open-interest adds all-exchange OI with 24h change for the top ~25 - coins outside that set have no OI context, so weight-by-OI reads on them are low-confidence.
 - Single-coin drill-down: /api/v1/derivatives/funding-rates?coin=X gives the cross-exchange snapshot; funding momentum needs history - /api/v1/hyperliquid/funding-rates?coin=X or /api/v1/derivatives/binance/funding-rates?symbol=XUSDT. Check the echoed coin/symbol field matches what you requested.
 - Pair with /api/v1/quant/market for regime context - extreme funding in a strong-trend regime resolves differently than in a chop regime.
-- Add ?format=markdown on supported endpoints for LLM-friendly plain-text output you can paste straight into {data}.
+- Add ?format=markdown on supported endpoints for LLM-friendly plain-text output you can hand your LLM clean plain text instead of raw JSON.
 
 ---
 

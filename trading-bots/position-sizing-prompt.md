@@ -34,13 +34,22 @@ Rules:
 - This is SIZING MATH given a decision already made, NOT a recommendation to enter. Never say buy or sell.
 
 [USER]
+First, get the live data: GET https://cryptodataapi.com/api/v1/quant/coins/risk — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
+
 Size this position. Account equity, risk-per-trade, and the coin's risk row from CryptoDataAPI /api/v1/quant/coins/risk are below:
 
-{data}
-
-(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/quant/coins/risk - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
-
 Compute the suggested position size and leverage cap using constant risk-per-trade inverse-volatility sizing. Return a JSON object {"symbol", "risk_dollars", "stop_pct", "suggested_notional", "leverage_cap", "vol_target_multiplier", "rv_24h", "notes"} followed by a few lines showing the arithmetic. This is sizing math for a decision already made - not a trade recommendation.
+
+[OUTPUT FORMAT — mimic the structure, not the values]
+{"symbol": "SOL", "risk_dollars": 250, "stop_pct": 0.048, "suggested_notional": 6510, "leverage_cap": 3.3, "vol_target_multiplier": 1.25, "rv_24h": 78.0, "notes": "rv_24h present; vol_pctile_30=0.62 elevated -> cap trimmed to 3.3x"}
+
+Working:
+- Equity 25,000 x risk_per_trade 1% = risk_dollars 250.
+- rv_24h 78% annualized -> ~4.1% per day; k=1.5, ~0.8-day hold -> stop_pct ~= 0.048 (4.8%).
+- base_position = 250 / 0.048 = 5,208.
+- x vol_target_multiplier 1.25 = suggested_notional 6,510.
+- leverage_cap = 6,510 / 25,000 = 0.26x raw; regime calm but vol_pctile_30=0.62 is elevated, so the 5x ceiling is trimmed to 3.3x. Position sits well under the cap.
+- Reminder: this is sizing arithmetic, not a signal to trade SOL.
 ```
 
 ## Example Output

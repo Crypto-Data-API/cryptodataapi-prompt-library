@@ -35,13 +35,14 @@ Output contract - respond with ONLY this JSON, no code fence, no extra text:
 The reason must be a terse log line citing the fields that drove the decision (e.g. 'regime=strong_trend_bull conf=0.71 p_up=0.62 gap=0.28'). Never return anything that is not valid JSON matching the contract.
 
 [USER]
+First, get the live data: GET https://cryptodataapi.com/api/v1/quant/coins/{symbol} — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
+
 Evaluate this entry candidate. Here is the coin's quant object from CryptoDataAPI /api/v1/quant/coins/{symbol}:
 
-{data}
-
-(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/quant/coins/{symbol} - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
-
 Apply the entry gate and return ONLY the JSON verdict object per the output contract. No prose.
+
+[OUTPUT FORMAT — mimic the structure, not the values]
+{"enter": true, "side": "long", "confidence": 0.62, "reason": "regime=strong_trend_bull conf=0.71 p_up=0.62 p_down=0.19 gap=0.43 transition_ok"}
 ```
 
 ## Example Output
@@ -62,7 +63,7 @@ curl -H "X-API-Key: cdk_live_yourkey" \
 
 ## Notes
 - Run this at temperature 0 with a fixed system prompt so the same quant object always yields the same verdict - a bot needs determinism, not creativity.
-- This endpoint is Pro tier: send a pro or pro_plus X-API-Key: cdk_live_... key. Fetch /api/v1/quant/coins/{symbol} per candle (or per your poll interval) and pass the raw object straight into {data}.
+- This endpoint is Pro tier: send a pro or pro_plus X-API-Key: cdk_live_... key. Fetch /api/v1/quant/coins/{symbol} per candle (or per your poll interval) and pass the raw object straight below the prompt.
 - Treat this as a confirmation gate on top of your own trigger, and size the resulting entry with the companion Volatility-Aware Position Sizer prompt (/api/v1/quant/coins/risk) rather than a fixed notional.
 
 ---

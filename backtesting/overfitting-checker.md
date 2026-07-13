@@ -31,13 +31,30 @@ How to respond:
 - Do not soften the verdict to be polite. If it looks overfit, say so plainly.
 
 [USER]
-Here is a proposed strategy and its in-sample backtest results. Historical OHLCV for out-of-sample re-testing is available from CryptoDataAPI's /backtesting/klines:
-
-{data}
-
-(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/backtesting/klines - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+First, get the live data: GET https://cryptodataapi.com/api/v1/backtesting/klines — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
 
 Act as an adversarial reviewer and stress-test this for overfitting. Produce: (1) a checklist verdict - PASS / WARN / FAIL on each red flag (parameter count, equity-curve smoothness, trade count, look-ahead bias, window cherry-picking, out-of-sample split, cost realism), each with a one-line reason; (2) a robustness score from 0-10 with your confidence; and (3) concrete fixes, including the SPECIFIC out-of-sample windows and symbols to pull from /backtesting/klines to re-test on unseen data. Be blunt.
+
+[OUTPUT FORMAT — mimic the structure, not the values]
+**Overfitting review**
+
+| Check | Verdict | Reason |
+|-------|---------|--------|
+| Parameter count | FAIL | 7 tuned thresholds (RSI len, 2 bands, 2 stops, ADX filter, lookback) on ~9 months of data - far too many knobs for the sample. |
+| Equity-curve smoothness | WARN | Reported max drawdown of 3% with a near-linear curve is implausibly clean for a leveraged crypto strategy. |
+| Trade count | FAIL | 24 trades total - below the ~30-50 floor to separate edge from luck; every metric is high-variance. |
+| Look-ahead bias | WARN | Entry appears to use the same-bar close that the signal is computed on - confirm the fill is next-bar open. |
+| Window cherry-picking | FAIL | Backtest runs Jan-Sep 2024 only, an uptrending stretch; it excludes the 2022 bear and 2021 blow-off. |
+| Out-of-sample split | FAIL | No OOS or walk-forward - tuning and reporting are on the identical dataset. |
+| Cost realism | WARN | Fees included, but no funding or slippage - the edge may be smaller than transaction costs at this trade frequency. |
+
+**Robustness score: 2 / 10** (high confidence). This reads as a curve fit to one favourable regime, not a validated edge.
+
+**Concrete fixes:**
+1. Cut parameters to at most 2-3 and justify each mechanically.
+2. True out-of-sample re-test - pull from /backtesting/klines and re-run UNTOUCHED on: BTCUSDT + ETHUSDT 1h for 2022-05 -> 2022-11 (bear), 2023-01 -> 2023-06 (recovery), and 2025-01 -> 2025-06 (recent). If the edge only survives the 2024 window, it does not exist.
+3. Add funding + slippage and re-check whether the edge clears costs at this frequency.
+4. Require >= 50 trades per test window before trusting any metric.
 ```
 
 ## Example Output
