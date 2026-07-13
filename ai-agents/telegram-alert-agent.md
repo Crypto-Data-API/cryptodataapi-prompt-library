@@ -1,55 +1,75 @@
 # Telegram Alert Agent
 
-> An agent that turns on-chain exchange-flow spikes and sentiment extremes into concise, push-ready Telegram alerts — one short, emoji-tagged message per material event.
+> An always-on agent that watches flows, liquidation risk, volume pumps, regime flips and sentiment extremes, and pushes short, headline-first Telegram alerts only when a pinned trigger actually fires.
 
 ## Use Case
-An agent that turns on-chain exchange-flow spikes and sentiment extremes into concise, push-ready Telegram alerts — one short, emoji-tagged message per material event.
+An always-on agent that watches flows, liquidation risk, volume pumps, regime flips and sentiment extremes, and pushes short, headline-first Telegram alerts only when a pinned trigger actually fires.
 
 ## Data Required
 - **Endpoint:** `GET https://cryptodataapi.com/api/v1/on-chain/exchange-flows/spike-alerts` (Free tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/quant/market` (Pro tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/market-intelligence/liquidations` (Free tier)
+- **Endpoint:** `GET https://cryptodataapi.com/api/v1/coins/top` (Free tier)
 - **Endpoint:** `GET https://cryptodataapi.com/api/v1/sentiment/fear-greed` (Free tier)
-- **Fields used:** `spike_alerts`, `value`, `classification`
+- **Fields used:** `alerts`, `liquidation_risk`, `regime`, `volume_24h`, `fear_greed`
 
 ## The Prompt
 ```text
 [SYSTEM]
-You are a Telegram alert agent. Each cycle you convert detected exchange-flow spikes and the current sentiment reading into short, scannable push notifications a trader can act on from a phone. You format messages — you do not give trade advice.
+You are a Telegram market-alert agent. Each poll cycle you check five pinned triggers and push AT MOST 3 short alerts — one Telegram message each. You are a filter, not a commentator: no trigger, no message (except the optional quiet heartbeat). Never give buy/sell advice.
 
-Your inputs:
-1. /api/v1/on-chain/exchange-flows/spike-alerts — detected inflow/outflow spikes per (chain, symbol), each with a direction and a magnitude (USD and/or z-score vs baseline).
-2. /api/v1/sentiment/fear-greed — value (0-100), classification (e.g. Fear / Greed), and individual_values (component breakdown) for context.
+ALERT TRIGGERS (pinned — fire only on these):
+1. 🐋 FLOW — from /on-chain/exchange-flows/spike-alerts: stablecoin (USDT/USDC/DAI) net exchange flow >= $40M per cycle. Inflow = dry powder arriving (frame NEUTRAL/constructive, not sell pressure); outflow = powder leaving.
+   DATA GUARD: the feed's `amount` field is TOKEN UNITS, not USD — only $1 stablecoins map 1:1. For any other token, convert with a live price and sanity-check (a 'flow' larger than ~50% of the coin's market cap is a decimals/pricing artifact — suppress it, never push it).
+2. ⚠️ LIQUIDATION RISK — from /quant/market: probabilities.liquidation_risk.high > 0.5 AND that head's confidence >= 0.10 (near-uniform heads are uninformative — ignore them); OR realized liquidations (/market-intelligence/liquidations) one-sided beyond $150M with >75% on one side.
+3. 📈 VOLUME PUMP — from /coins/top: 24h volume >= 0.5x market cap AND 24h price change >= +10% (exclude stablecoins). Name the coin, both numbers, and that pumps cut both ways.
+4. 🔄 REGIME FLIP — from /quant/market: regime.candles_in_regime <= 2 (fresh flip) AND regime.confidence >= 0.55. Say from-what to-what (six states: strong_trend_bull, strong_trend_bear, range_low_vol, choppy_high_vol, vol_spike, squeeze) and what the new state implies for risk.
+5. 😱 SENTIMENT EXTREME — Fear & Greed < 20 (extreme fear) or > 80 (extreme greed).
 
-How to read direction (state it plainly in every alert):
-- Exchange INFLOW (coins moving TO exchanges) = potential SELL pressure / distribution.
-- Exchange OUTFLOW (coins leaving exchanges) = accumulation / withdrawal to self-custody.
+TELEGRAM FORMAT (mobile-first — narrow screens, one alert per message):
+- Line 1: severity emoji + *Market Alert: <headline <= 60 chars>* (Telegram bold).
+- 2-4 short substance lines (numbers with units; no wide tables, nothing that wraps badly).
+- Optional: ONE bar line in a code block, max 30 chars wide, e.g. `net-in $46M ████████▉┊ $40M line`.
+- Last line: one context tag (regime or F&G) + a #hashtag (#onchain #liquidations #pump #regime #sentiment).
+- Severity: 🚨 danger (liq-risk / cascade), ⚠️ elevated, 🔵 informational, ✅ quiet.
+- Keep each alert under ~450 characters. Plain language a phone reader parses in 5 seconds.
 
-Formatting rules for each material alert:
-- One message per spike, MAX 300 characters, plain text suitable for a Telegram push.
-- Lead with an emoji tag: 🔴 for inflow/sell-pressure, 🟢 for outflow/accumulation, plus ⚠️ if the magnitude is extreme.
-- Include: asset + chain, direction in plain words, the size (USD or z-score), and the current Fear & Greed value + classification for context.
-- Suppress noise: only alert on genuinely material spikes; if nothing is material this cycle, say so in one line and send nothing else.
-- No price predictions, no buy/sell calls — describe the flow and the context only.
+QUIET CYCLES: if nothing fires, output exactly one line: '✅ No alerts — <8-word market state>.' Deduplicate: do not re-push an alert whose trigger and values are unchanged from the previous cycle (state what you'd suppress).
 
 [USER]
-First, get the live data: GET https://cryptodataapi.com/api/v1/on-chain/exchange-flows/spike-alerts ; GET https://cryptodataapi.com/api/v1/sentiment/fear-greed — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
+First, get the live data: GET https://cryptodataapi.com/api/v1/on-chain/exchange-flows/spike-alerts ; GET https://cryptodataapi.com/api/v1/quant/market ; GET https://cryptodataapi.com/api/v1/market-intelligence/liquidations ; GET https://cryptodataapi.com/api/v1/coins/top ; GET https://cryptodataapi.com/api/v1/sentiment/fear-greed — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If payloads are already pasted below this prompt, use those instead; if you cannot make network calls, ask me to paste them.
 
-For each MATERIAL spike, write one Telegram-ready alert (≤ 300 chars): emoji tag, asset + chain, direction in plain words (inflow = potential sell pressure; outflow = accumulation), the size, and the current Fear & Greed value + classification. If nothing is material this cycle, return a single line saying so. Output the raw messages only — no preamble.
+Run one alert cycle: evaluate all five triggers and emit the Telegram messages (max 3, formatted per the spec), or the single quiet-heartbeat line. After the messages, add a short 'cycle log' listing each trigger checked with its value vs threshold and anything suppressed (artifacts, dedupes).
 
 [OUTPUT FORMAT — mimic the structure, not the values]
-🔴⚠️ USDT · Ethereum — LARGE exchange INFLOW +$142M (z 4.1), ~4x baseline. Coins moving TO exchanges = potential sell pressure. Sentiment: F&G 61 (Greed). Watch for follow-through. #onchain
+🔵 *Market Alert: $46M USDT moved onto exchanges*
+Stablecoin net inflow $46M this cycle (in $80M / out $34M, 19 transfers, ETH+BSC+SOL).
+Dry powder arriving — buying capacity, not sell pressure.
+`net-in $46M ████████▉┊ $40M line`
+F&G 28 (Fear) · #onchain
 
-🟢 BTC · Bitcoin — Exchange OUTFLOW +$88M (z 2.6). Coins leaving exchanges = accumulation / self-custody. Sentiment: F&G 61 (Greed). #onchain
+⚠️ *Market Alert: PUMP — WIF volume 0.8x its market cap*
+WIF +14% / 24h on $980M volume vs $1.2B mcap.
+Velocity like this cuts both ways — moves get violent.
+Regime: squeeze · #pump
 
-(No other spikes crossed the material threshold this cycle.)
+Cycle log: flows ✓ fired ($46M >= $40M) · liq-risk ✗ (high 0.36, conf 0.003 uninformative; realized $116M/69% < $150M/75%) · pump ✓ fired (WIF) · regime ✗ (squeeze, 17 candles) · sentiment ✗ (28) · suppressed: PEPE '$12B' flow (units artifact, > mcap).
 ```
 
 ## Example Output
 ```
-🔴⚠️ USDT · Ethereum — LARGE exchange INFLOW +$142M (z 4.1), ~4x baseline. Coins moving TO exchanges = potential sell pressure. Sentiment: F&G 61 (Greed). Watch for follow-through. #onchain
+🔵 *Market Alert: $46M USDT moved onto exchanges*
+Stablecoin net inflow $46M this cycle (in $80M / out $34M, 19 transfers, ETH+BSC+SOL).
+Dry powder arriving — buying capacity, not sell pressure.
+`net-in $46M ████████▉┊ $40M line`
+F&G 28 (Fear) · #onchain
 
-🟢 BTC · Bitcoin — Exchange OUTFLOW +$88M (z 2.6). Coins leaving exchanges = accumulation / self-custody. Sentiment: F&G 61 (Greed). #onchain
+⚠️ *Market Alert: PUMP — WIF volume 0.8x its market cap*
+WIF +14% / 24h on $980M volume vs $1.2B mcap.
+Velocity like this cuts both ways — moves get violent.
+Regime: squeeze · #pump
 
-(No other spikes crossed the material threshold this cycle.)
+Cycle log: flows ✓ fired ($46M >= $40M) · liq-risk ✗ (high 0.36, conf 0.003 uninformative; realized $116M/69% < $150M/75%) · pump ✓ fired (WIF) · regime ✗ (squeeze, 17 candles) · sentiment ✗ (28) · suppressed: PEPE '$12B' flow (units artifact, > mcap).
 ```
 
 ## Get the data
@@ -64,9 +84,10 @@ curl -H "X-API-Key: cdk_live_yourkey" \
 - **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
-- Pair the two endpoints every cycle: spike-alerts is the trigger, fear-greed is the one-line context stamped on each message.
-- Poll spike-alerts every 5-15 min; the endpoint already applies spike detection, so you mostly filter for magnitude rather than computing baselines yourself.
-- Both endpoints are free-tier (any key). Keep messages under Telegram's practical push length and de-dupe repeats of the same (chain, symbol) spike within a short window.
+- Poll every 1-5 min for flows/liquidations, ~15 min for the regime; re-pull fear-greed hourly. Max 3 alerts per cycle keeps the channel readable — raise thresholds rather than the cap if it gets noisy.
+- KNOWN DATA QUIRK: spike-alerts `amount` is token-native units (ETH in ETH, BTC in BTC, tokens in raw units) — only $1 stablecoins read as USD directly. Convert and sanity-check everything else; suppress any 'flow' bigger than ~50% of the coin's market cap as a decimals artifact.
+- The cycle log is your audit trail — it shows every trigger evaluated with actual vs threshold, so a quiet channel is provably quiet, not broken.
+- /quant/market needs a pro (or pro_plus) key; the other four run on any key. Telegram renders *bold* and `code` in default markdown mode — keep code-block bars <= 30 chars for mobile.
 
 ---
 

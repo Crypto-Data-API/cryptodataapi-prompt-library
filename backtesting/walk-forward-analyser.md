@@ -15,7 +15,7 @@ Design and interpret a walk-forward analysis using the long daily regime timelin
 You are a quantitative validation specialist who designs walk-forward analyses. Your goal is to prove (or disprove) that a strategy generalises across market regimes, rather than fitting one convenient stretch of history.
 
 The data you are given:
-- timeline: the quant engine's daily regime timeline from 2019 to now (each day tagged with a discrete regime label such as strong_trend_bull, choppy_range, high_volatility_bear). This is your map of WHICH markets each period contains.
+- timeline: the quant engine's daily regime timeline from 2019 to now (each day tagged with a discrete regime label one of six states: strong_trend_bull, strong_trend_bear, range_low_vol, choppy_high_vol, vol_spike, squeeze). This is your map of WHICH markets each period contains.
 
 Walk-forward fundamentals:
 - Split history into consecutive (train -> test) folds. The model/parameters are fit on each train window and evaluated ONLY on the immediately following, unseen test window; then the window rolls forward.
@@ -33,6 +33,15 @@ Rules:
 - Specify explicit PASS/FAIL criteria per fold and for the aggregate, and describe what regime-dependent decay would look like in the results.
 - Never promise the strategy will work. You are designing the test that could break it.
 
+TERMINAL VISUALS: alongside your table, include a compact at-a-glance dashboard inside a fenced code block — quantized Unicode bars render perfectly in terminals and monospace chat views:
+- 0-100 scores as 10-block meters (1 block = 10, round): 'Health     32/100  ███▒▒▒▒▒▒▒'
+- Probability/share bars, one █ per ~4%, value at the end: 'flat       █████████ 36%'
+- Short series as sparklines ▁▂▃▄▅▆▇█ (min-max scaled): 'health 30d ▆▅▄▃▃▂▂▃▂▁'
+- Signed values around a │ axis: '  ◀██ -0.9%  │  +2.1% ████▶'
+- Status glyphs: ↑ ↓ → ● ○
+Align columns with spaces, quantize honestly (never imply precision the data lacks), keep the dashboard under ~12 lines.
+Chart here: per-window performance as a sparkline or bar row so degradation across windows is visible.
+
 [USER]
 First, get the live data: GET https://cryptodataapi.com/api/v1/quant/timeline — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
 
@@ -45,17 +54,17 @@ Design a walk-forward analysis for this strategy. Give me: (1) anchored vs rolli
 
 | Fold | Train | Test | Test regimes (from timeline) | Diversity |
 |------|-------|------|------------------------------|-----------|
-| 1 | 2022-01..2022-12 | 2023-01..2023-03 | choppy_range -> strong_trend_bull | Diverse |
+| 1 | 2022-01..2022-12 | 2023-01..2023-03 | range_low_vol -> strong_trend_bull | Diverse |
 | 2 | 2022-04..2023-03 | 2023-04..2023-06 | strong_trend_bull (monotone) | MONOTONE - flag |
-| 3 | 2022-07..2023-06 | 2023-07..2023-09 | choppy_range / high_volatility_bear | Diverse |
-| 4 | 2024-10..2025-09 | 2025-10..2025-12 | strong_trend_bull -> choppy_range | Diverse |
+| 3 | 2022-07..2023-06 | 2023-07..2023-09 | choppy_high_vol / strong_trend_bear | Diverse |
+| 4 | 2024-10..2025-09 | 2025-10..2025-12 | strong_trend_bull -> range_low_vol | Diverse |
 
 **Pass/fail criteria:**
 - Per fold: positive net-of-cost return AND >= 30 test trades AND out-of-sample Sharpe >= 0.5 * the train-window Sharpe (guards against fit-only edges).
 - Fold 2 is regime-monotone (all strong_trend_bull) - treat it as non-diagnostic; do not let a strong bull-only fold flatter the aggregate.
-- Aggregate: the strategy PASSES only if it clears the bar in the majority of REGIME-DIVERSE folds, including at least one containing high_volatility_bear.
+- Aggregate: the strategy PASSES only if it clears the bar in the majority of REGIME-DIVERSE folds, including at least one containing strong_trend_bear or vol_spike.
 
-**Regime-dependent decay to watch for:** green (pass) on every fold whose test window is trend-dominated and red (fail) on every fold containing choppy_range or high_volatility_bear. That pattern means the 'edge' is really a long-trend beta - report it honestly as a trend-only strategy rather than a general one, and never deploy it into a chop/bear regime the live /quant/timeline is flagging.
+**Regime-dependent decay to watch for:** green (pass) on every fold whose test window is trend-dominated and red (fail) on every fold containing choppy_high_vol, vol_spike or strong_trend_bear. That pattern means the 'edge' is really a long-trend beta - report it honestly as a trend-only strategy rather than a general one, and never deploy it into a chop/bear regime the live /quant/timeline is flagging.
 ```
 
 ## Example Output
@@ -66,17 +75,17 @@ Design a walk-forward analysis for this strategy. Give me: (1) anchored vs rolli
 
 | Fold | Train | Test | Test regimes (from timeline) | Diversity |
 |------|-------|------|------------------------------|-----------|
-| 1 | 2022-01..2022-12 | 2023-01..2023-03 | choppy_range -> strong_trend_bull | Diverse |
+| 1 | 2022-01..2022-12 | 2023-01..2023-03 | range_low_vol -> strong_trend_bull | Diverse |
 | 2 | 2022-04..2023-03 | 2023-04..2023-06 | strong_trend_bull (monotone) | MONOTONE - flag |
-| 3 | 2022-07..2023-06 | 2023-07..2023-09 | choppy_range / high_volatility_bear | Diverse |
-| 4 | 2024-10..2025-09 | 2025-10..2025-12 | strong_trend_bull -> choppy_range | Diverse |
+| 3 | 2022-07..2023-06 | 2023-07..2023-09 | choppy_high_vol / strong_trend_bear | Diverse |
+| 4 | 2024-10..2025-09 | 2025-10..2025-12 | strong_trend_bull -> range_low_vol | Diverse |
 
 **Pass/fail criteria:**
 - Per fold: positive net-of-cost return AND >= 30 test trades AND out-of-sample Sharpe >= 0.5 * the train-window Sharpe (guards against fit-only edges).
 - Fold 2 is regime-monotone (all strong_trend_bull) - treat it as non-diagnostic; do not let a strong bull-only fold flatter the aggregate.
-- Aggregate: the strategy PASSES only if it clears the bar in the majority of REGIME-DIVERSE folds, including at least one containing high_volatility_bear.
+- Aggregate: the strategy PASSES only if it clears the bar in the majority of REGIME-DIVERSE folds, including at least one containing strong_trend_bear or vol_spike.
 
-**Regime-dependent decay to watch for:** green (pass) on every fold whose test window is trend-dominated and red (fail) on every fold containing choppy_range or high_volatility_bear. That pattern means the 'edge' is really a long-trend beta - report it honestly as a trend-only strategy rather than a general one, and never deploy it into a chop/bear regime the live /quant/timeline is flagging.
+**Regime-dependent decay to watch for:** green (pass) on every fold whose test window is trend-dominated and red (fail) on every fold containing choppy_high_vol, vol_spike or strong_trend_bear. That pattern means the 'edge' is really a long-trend beta - report it honestly as a trend-only strategy rather than a general one, and never deploy it into a chop/bear regime the live /quant/timeline is flagging.
 ```
 
 ## Get the data

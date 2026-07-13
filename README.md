@@ -35,7 +35,7 @@ claude mcp add --transport http cryptodataapi https://cryptodataapi.com/mcp --he
 - **[Autonomous Portfolio Risk Monitor](ai-agents/autonomous-risk-monitor.md)** — An always-on agent that continuously watches market-wide risk and raises its alert level when regime, liquidity fragility, and liquidations line up to danger — so a human or downstream system can de-risk before a cascade.
 - **[Multi-Factor Signal Generator Agent](ai-agents/signal-generator-agent.md)** — An agent that scans the full coin universe and emits a ranked, evidence-backed shortlist of WATCH signals by combining each coin's quant regime and directional probabilities with cross-exchange funding.
 - **[MCP Market Analyst (Claude Desktop / Cursor)](ai-agents/mcp-claude-market-analyst.md)** — Wire CryptoDataAPI into Claude through an MCP tool so Claude can pull a full one-call market snapshot on demand and answer any market question grounded in live data — no copy-paste, no stale context.
-- **[Telegram Alert Agent](ai-agents/telegram-alert-agent.md)** — An agent that turns on-chain exchange-flow spikes and sentiment extremes into concise, push-ready Telegram alerts — one short, emoji-tagged message per material event.
+- **[Telegram Alert Agent](ai-agents/telegram-alert-agent.md)** — An always-on agent that watches flows, liquidation risk, volume pumps, regime flips and sentiment extremes, and pushes short, headline-first Telegram alerts only when a pinned trigger actually fires.
 
 ### Backtesting
 

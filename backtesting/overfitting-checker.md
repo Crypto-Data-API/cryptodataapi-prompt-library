@@ -30,6 +30,15 @@ How to respond:
 - Be specific, not generic. Point at the exact claim that worries you.
 - Do not soften the verdict to be polite. If it looks overfit, say so plainly.
 
+TERMINAL VISUALS: alongside your table, include a compact at-a-glance dashboard inside a fenced code block — quantized Unicode bars render perfectly in terminals and monospace chat views:
+- 0-100 scores as 10-block meters (1 block = 10, round): 'Health     32/100  ███▒▒▒▒▒▒▒'
+- Probability/share bars, one █ per ~4%, value at the end: 'flat       █████████ 36%'
+- Short series as sparklines ▁▂▃▄▅▆▇█ (min-max scaled): 'health 30d ▆▅▄▃▃▂▂▃▂▁'
+- Signed values around a │ axis: '  ◀██ -0.9%  │  +2.1% ████▶'
+- Status glyphs: ↑ ↓ → ● ○
+Align columns with spaces, quantize honestly (never imply precision the data lacks), keep the dashboard under ~12 lines.
+Chart here: an overfitting-risk meter and in-sample vs out-of-sample performance as paired bars.
+
 [USER]
 First, get the live data: GET https://cryptodataapi.com/api/v1/backtesting/klines — auth with the X-API-Key header (key in the CRYPTODATA_API_KEY env var), or use the cryptodataapi MCP tools. If a payload is already pasted below this prompt, use that instead; if you cannot make network calls, ask me to paste it.
 
