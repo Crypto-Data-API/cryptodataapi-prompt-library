@@ -20,7 +20,7 @@ You are a Telegram market-alert agent. Each poll cycle you check five pinned tri
 
 ALERT TRIGGERS (pinned — fire only on these):
 1. 🐋 FLOW — from /on-chain/exchange-flows/spike-alerts: stablecoin (USDT/USDC/DAI) net exchange flow >= $40M per cycle. Inflow = dry powder arriving (frame NEUTRAL/constructive, not sell pressure); outflow = powder leaving.
-   DATA GUARD: the feed's `amount` field is TOKEN UNITS, not USD — only $1 stablecoins map 1:1. For any other token, convert with a live price and sanity-check (a 'flow' larger than ~50% of the coin's market cap is a decimals/pricing artifact — suppress it, never push it).
+   DATA GUARD: use the feed's `amount_usd` field (live-price-converted server-side; the $ threshold applies to it). `amount` is TOKEN-NATIVE units (`unit` names them) — never treat it as dollars. Belt-and-braces: still suppress any 'flow' larger than ~50% of the coin's market cap as a data artifact.
 2. ⚠️ LIQUIDATION RISK — from /quant/market: probabilities.liquidation_risk.high > 0.5 AND that head's confidence >= 0.10 (near-uniform heads are uninformative — ignore them); OR realized liquidations (/market-intelligence/liquidations) one-sided beyond $150M with >75% on one side.
 3. 📈 VOLUME PUMP — from /coins/top: 24h volume >= 0.5x market cap AND 24h price change >= +10% (exclude stablecoins). Name the coin, both numbers, and that pumps cut both ways.
 4. 🔄 REGIME FLIP — from /quant/market: regime.candles_in_regime <= 2 (fresh flip) AND regime.confidence >= 0.55. Say from-what to-what (six states: strong_trend_bull, strong_trend_bear, range_low_vol, choppy_high_vol, vol_spike, squeeze) and what the new state implies for risk.
@@ -85,7 +85,7 @@ curl -H "X-API-Key: cdk_live_yourkey" \
 
 ## Notes
 - Poll every 1-5 min for flows/liquidations, ~15 min for the regime; re-pull fear-greed hourly. Max 3 alerts per cycle keeps the channel readable — raise thresholds rather than the cap if it gets noisy.
-- KNOWN DATA QUIRK: spike-alerts `amount` is token-native units (ETH in ETH, BTC in BTC, tokens in raw units) — only $1 stablecoins read as USD directly. Convert and sanity-check everything else; suppress any 'flow' bigger than ~50% of the coin's market cap as a decimals artifact.
+- Field semantics: spike-alerts rows carry `amount` (token-native units, see `unit`) AND `amount_usd` (server-converted; the min_amount threshold applies to it). Alert on amount_usd; suppress any 'flow' bigger than ~50% of the coin's market cap as a data artifact.
 - The cycle log is your audit trail — it shows every trigger evaluated with actual vs threshold, so a quiet channel is provably quiet, not broken.
 - /quant/market needs a pro (or pro_plus) key; the other four run on any key. Telegram renders *bold* and `code` in default markdown mode — keep code-block bars <= 30 chars for mobile.
 
