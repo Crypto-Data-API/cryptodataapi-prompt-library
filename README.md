@@ -23,7 +23,7 @@ Get a free key at [cryptodataapi.com/login](https://cryptodataapi.com/login) —
 **Prefer a native tool?** Install the MCP server (Claude / Cursor / any MCP client):
 
 ```bash
-claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp
+claude mcp add --transport http cryptodataapi https://cryptodataapi.com/mcp --header "X-API-Key: cdk_live_YOUR_KEY"
 ```
 
 **Used with:** Claude · GPT-4o · Gemini · Cursor · Continue

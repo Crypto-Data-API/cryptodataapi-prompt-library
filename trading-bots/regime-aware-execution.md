@@ -37,6 +37,8 @@ Configure execution for an order that is already decided and sized. Here is the 
 
 {data}
 
+(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/quant/market ; GET https://cryptodataapi.com/api/v1/liquidity/depth - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+
 Return a compact JSON execution config: {"order_type", "aggression", "max_participation_pct", "slice_size_usd", "limit_offset_bps", "pause_if", "rationale"}. Base slice_size_usd and max_participation on the actual total_depth_25bps_usd, choose order_type from the regime + volatility, use imbalance_10bps to pick the passive side, and give an explicit pause condition. One-line rationale only.
 ```
 
@@ -53,7 +55,7 @@ curl -H "X-API-Key: cdk_live_yourkey" \
 ```
 
 - **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
-- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add --transport http cryptodataapi https://cryptodataapi.com/mcp --header "X-API-Key: cdk_live_YOUR_KEY"`, then set `CRYPTODATA_API_KEY`
 - **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes

@@ -31,6 +31,8 @@ The get_market_snapshot tool returned the current CryptoDataAPI daily snapshot:
 
 {data}
 
+(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/daily - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+
 Using ONLY this snapshot, give me a grounded read of the market right now: overall market_health (long-term vs short-term), the sentiment reading and what it implies, and the derivatives summary (funding / open interest tone). Cite the specific fields you used and state the snapshot's age. Note explicitly that this is a once-a-day snapshot, not real-time data. No trade advice.
 ```
 
@@ -55,7 +57,7 @@ curl -H "X-API-Key: cdk_live_yourkey" \
 ```
 
 - **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
-- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add --transport http cryptodataapi https://cryptodataapi.com/mcp --header "X-API-Key: cdk_live_YOUR_KEY"`, then set `CRYPTODATA_API_KEY`
 - **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes

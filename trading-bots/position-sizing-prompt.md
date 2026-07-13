@@ -38,6 +38,8 @@ Size this position. Account equity, risk-per-trade, and the coin's risk row from
 
 {data}
 
+(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/quant/coins/risk - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+
 Compute the suggested position size and leverage cap using constant risk-per-trade inverse-volatility sizing. Return a JSON object {"symbol", "risk_dollars", "stop_pct", "suggested_notional", "leverage_cap", "vol_target_multiplier", "rv_24h", "notes"} followed by a few lines showing the arithmetic. This is sizing math for a decision already made - not a trade recommendation.
 ```
 
@@ -62,7 +64,7 @@ curl -H "X-API-Key: cdk_live_yourkey" \
 ```
 
 - **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
-- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add --transport http cryptodataapi https://cryptodataapi.com/mcp --header "X-API-Key: cdk_live_YOUR_KEY"`, then set `CRYPTODATA_API_KEY`
 - **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes

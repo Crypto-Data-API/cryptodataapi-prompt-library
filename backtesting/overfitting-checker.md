@@ -35,6 +35,8 @@ Here is a proposed strategy and its in-sample backtest results. Historical OHLCV
 
 {data}
 
+(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/backtesting/klines - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+
 Act as an adversarial reviewer and stress-test this for overfitting. Produce: (1) a checklist verdict - PASS / WARN / FAIL on each red flag (parameter count, equity-curve smoothness, trade count, look-ahead bias, window cherry-picking, out-of-sample split, cost realism), each with a one-line reason; (2) a robustness score from 0-10 with your confidence; and (3) concrete fixes, including the SPECIFIC out-of-sample windows and symbols to pull from /backtesting/klines to re-test on unseen data. Be blunt.
 ```
 
@@ -69,7 +71,7 @@ curl -H "X-API-Key: cdk_live_yourkey" \
 ```
 
 - **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
-- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add --transport http cryptodataapi https://cryptodataapi.com/mcp --header "X-API-Key: cdk_live_YOUR_KEY"`, then set `CRYPTODATA_API_KEY`
 - **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes

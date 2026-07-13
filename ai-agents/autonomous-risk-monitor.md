@@ -33,6 +33,8 @@ Here is the current market risk snapshot from CryptoDataAPI (quant regime, liqui
 
 {data}
 
+(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/quant/market ; GET https://cryptodataapi.com/api/v1/liquidity/regime/score ; GET https://cryptodataapi.com/api/v1/market-intelligence/liquidations - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+
 Assess market-wide risk right now. Return exactly: (1) RISK LEVEL as one of GREEN / AMBER / RED; (2) the 2-3 signals that drove it, each with its value (regime.label, liquidation_risk, fragility_score, and the dominant liquidation side/size); (3) a recommended de-risking action band (posture only — no buy/sell calls). Keep it under 120 words and lead with the level.
 ```
 
@@ -58,7 +60,7 @@ curl -H "X-API-Key: cdk_live_yourkey" \
 ```
 
 - **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
-- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add --transport http cryptodataapi https://cryptodataapi.com/mcp --header "X-API-Key: cdk_live_YOUR_KEY"`, then set `CRYPTODATA_API_KEY`
 - **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes

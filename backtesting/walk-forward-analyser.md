@@ -38,6 +38,8 @@ Here is the daily regime timeline from CryptoDataAPI's quant engine, plus the st
 
 {data}
 
+(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/quant/timeline - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+
 Design a walk-forward analysis for this strategy. Give me: (1) anchored vs rolling recommendation with a one-line justification; (2) a table of the concrete train -> test folds (dates + train:test ratio); (3) for each TEST fold, the regimes it spans from the timeline and whether it is regime-diverse or monotone (flag the monotone ones); (4) explicit PASS/FAIL criteria per fold and in aggregate; and (5) what regime-dependent decay would look like - the specific pattern across folds that would tell me the edge is regime-conditional rather than general. Do not predict performance.
 ```
 
@@ -70,7 +72,7 @@ curl -H "X-API-Key: cdk_live_yourkey" \
 ```
 
 - **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
-- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add --transport http cryptodataapi https://cryptodataapi.com/mcp --header "X-API-Key: cdk_live_YOUR_KEY"`, then set `CRYPTODATA_API_KEY`
 - **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes

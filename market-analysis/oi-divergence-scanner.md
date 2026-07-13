@@ -32,6 +32,8 @@ Here is the current open-interest divergence scan from CryptoDataAPI:
 
 {data}
 
+(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/liquidity/oi-divergence - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+
 Classify each notable coin into one of the four quadrants - new longs (price up / OI up), short covering (price up / OI down), new shorts (price down / OI up), or long liquidation (price down / OI down) - using the 4h price and OI changes. For each, note the OI context (open_interest_usd) and what the divergence implies about conviction. Rank them by the absolute value of divergence_4h, flagging the strongest fresh-money moves and the weakest hollow ones. Return a markdown table plus a two-sentence summary.
 ```
 
@@ -55,7 +57,7 @@ curl -H "X-API-Key: cdk_live_yourkey" \
 ```
 
 - **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
-- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add --transport http cryptodataapi https://cryptodataapi.com/mcp --header "X-API-Key: cdk_live_YOUR_KEY"`, then set `CRYPTODATA_API_KEY`
 - **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes

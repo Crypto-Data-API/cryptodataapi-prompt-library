@@ -35,6 +35,8 @@ Here is a run of historical daily market snapshots plus the quant regime history
 
 {data}
 
+(If the {data} block above is empty, fetch it yourself: GET https://cryptodataapi.com/api/v1/backtesting/daily-snapshots ; GET https://cryptodataapi.com/api/v1/quant/regimes/history - auth with the X-API-Key header from your CRYPTODATA_API_KEY env var, or use the cryptodataapi MCP tools - then continue.)
+
 Generate 2-3 concrete, backtestable strategy hypotheses. For each one, give me: (1) the premise / mechanism in one or two sentences; (2) a mechanical ENTRY rule referencing specific snapshot fields; (3) a mechanical EXIT rule; (4) the regime or market condition from the regime history that it is meant to exploit, and how you'd filter for it; and (5) a falsification test - the specific backtest result that would prove the edge does not exist. Number the hypotheses. Do NOT promise returns or give trade advice - these are ideas to test.
 ```
 
@@ -72,7 +74,7 @@ curl -H "X-API-Key: cdk_live_yourkey" \
 ```
 
 - **Get a free API key:** https://cryptodataapi.com/login (no signup required for most feeds)
-- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add cryptodataapi -- npx -y cryptodataapi-mcp`, then set `CRYPTODATA_API_KEY`
+- **Or use the MCP server** (Claude / Cursor / any MCP client): `claude mcp add --transport http cryptodataapi https://cryptodataapi.com/mcp --header "X-API-Key: cdk_live_YOUR_KEY"`, then set `CRYPTODATA_API_KEY`
 - **Full API docs:** https://cryptodataapi.com/api/docs
 
 ## Notes
